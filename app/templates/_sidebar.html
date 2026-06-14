@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sidebar Menu</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div id="sidebar"
+    class="w-64 bg-white shadow-md flex-shrink-0 transition-all duration-300 transform-gpu overflow-y-auto">
+    <div class="p-4">
+      <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
+        Main Menu
+      </h3>
+      <ul class="space-y-1">
+        <!-- Dashboard  -->
+        <li>
+          <a href="{{ url_for('auth_bp.dashboard') }}" class="sidebar-item"><i
+              class="fa-solid fa-tachometer-alt"></i><span> Dashboard</span></a>
+        </li>
+
+        <!-- Tagging Dropdown -->
+        <li>
+          <button type="button" onclick="toggleDropdown('tagging-dropdown', 'chevron-icon')"
+            class="sidebar-item w-full flex justify-between items-center">
+            <span><i class="fa-solid fa-tags"></i> Tagging</span>
+            <i id="chevron-icon" class="fa-solid fa-chevron-right"></i>
+          </button>
+          <ul id="tagging-dropdown" class="hidden pl-6 mt-1 space-y-1 text-sm text-gray-600">
+            <li>
+              <a href="{{ url_for('tagging_bp.tag_subject') }}" class="block hover:text-blue-600">Subject Level</a>
+            </li>
+            <li>
+              <a href="{{ url_for('tagging_bp.tag_department') }}" class="block hover:text-blue-600">Department</a>
+            </li>
+            <li>
+              <a href="{{ url_for('tagging_bp.tag_programme') }}" class="block hover:text-blue-600">Programme</a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Import Data Dropdown -->
+        <li>
+          <button type="button" onclick="toggleDropdown('import-dropdown', 'chevron-import')"
+            class="sidebar-item w-full flex justify-between items-center">
+            <span><i class="fa-solid fa-file-import"></i> Import Data</span>
+            <i id="chevron-import" class="fa-solid fa-chevron-right"></i>
+          </button>
+          <ul id="import-dropdown" class="hidden pl-6 mt-1 space-y-1 text-sm text-gray-600">
+            <li>
+              <a href="{{ url_for('classroom_bp.classroom') }}" class="block hover:text-blue-600">Classroom</a>
+            </li>
+            <li>
+              <a href="{{ url_for('lecturer_bp.lecturer') }}" class="block hover:text-blue-600">Lecturer</a>
+            </li>
+            <li>
+              <a href="{{ url_for('subject_bp.subject') }}" class="block hover:text-blue-600">Subject</a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Add Batches -->
+        <li>
+          <a href="{{ url_for('batches_bp.batches') }}" class="sidebar-item">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Add Batches</span>
+          </a>
+        </li>
+
+        <!-- Generate Timetable  -->
+        <li>
+          <a href="{{ url_for('generate_timetable_bp.generate_timetable') }}" class="sidebar-item">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span>Generate Timetable</span>
+          </a>
+        </li>
+      </ul>
+
+      <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-8 mb-4">
+        Settings
+      </h3>
+      <ul class="space-y-1">
+        <li>
+          <a href="{{ url_for('settings_bp.settings') }}" class="sidebar-item">
+            <i class="fa-solid fa-cog"></i><span> Settings</span>
+          </a>
+
+
+        </li>
+        <li>
+          <a href="{{ url_for('help_support') }}" class="sidebar-item"><i class="fa-solid fa-question-circle"></i><span>
+              Help &
+              Support</span></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+
+</html>

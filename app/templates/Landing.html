@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AICelerate - AI-Powered University Timetable Scheduler</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/Landing.css') }}"
+    />
+
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/Landing.js') }}"></script>
+  </head>
+
+  <body>
+    <!-- Navigation -->
+    <nav id="main-nav">
+      <div class="container">
+        <div class="nav-flex">
+          <div class="left-section">
+            <div class="logo">
+              <i class="fa-solid fa-calendar-check icon"></i>
+              <a id="brand-link" href="#">
+                <span class="brand" id="brand-name"></span>
+              </a>
+            </div>
+            <div class="menu">
+              <a class="nav-item active" id="nav-overview"></a>
+              <a class="nav-item" id="nav-features"></a>
+              <a class="nav-item" id="nav-pricing"></a>
+              <a class="nav-item" id="nav-contact"></a>
+            </div>
+          </div>
+
+          <div class="right-section">
+            <a href="{{ url_for('auth_bp.login') }}">
+              <button id="login-btn" class="btn-primary">
+                <i class="fa-solid fa-user-circle mr-2"></i> Login
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="overview">
+      <div class="container">
+        <div class="hero-flex">
+          <!-- Text Column -->
+          <div class="hero-text animate-fade-in">
+            <h1 id="hero-heading"></h1>
+            <p id="hero-description"></p>
+            <div class="hero-buttons">
+              <a
+                id="get-started-btn"
+                class="btn-primary"
+                href="{{ url_for('auth_bp.login') }}"
+              >
+                <i class="fa-solid fa-rocket"></i>
+                <span id="get-started-text">Get Started</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Image/Video Column -->
+          <div class="hero-image animate-fade-in delayed">
+            <div class="image-wrapper">
+              <div class="glow-bg"></div>
+              <div class="image-box">
+                <video id="hero-video" autoplay muted loop playsinline>
+                  <source id="video-source" src="" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+                <div class="image-caption">
+                  <h3 id="video-caption-title"></h3>
+                  <p id="video-caption-desc"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features">
+      <div class="container">
+        <div class="section-header animate-fade-in">
+          <h2 id="features-title"></h2>
+          <p id="features-description"></p>
+        </div>
+
+        <div class="features-grid" id="features-grid-1">
+          <!-- Feature Cards will be dynamically inserted here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section 2 -->
+    <section id="features2">
+      <div class="container">
+        <div class="features-grid" id="features-grid-2">
+          <!-- Feature Cards will be dynamically inserted here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+
+    <section id="pricing" class="py-16 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 animate-fade-in">
+          <h2
+            id="pricing-title"
+            class="text-clamp font-bold text-dark mb-4"
+          ></h2>
+          <p
+            id="pricing-description"
+            class="text-gray-600 max-w-2xl mx-auto"
+          ></p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="pricing-cards">
+          <!-- Pricing cards will be dynamically inserted here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section 2 -->
+
+    <section id="pricing2" class="py-16 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 animate-fade-in">
+          <h2
+            id="pricing2-title"
+            class="text-clamp font-bold text-dark mb-4"
+          ></h2>
+          <p
+            id="pricing2-description"
+            class="text-gray-600 max-w-2xl mx-auto"
+          ></p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="pricing-cards">
+          <!-- Pricing cards will be dynamically inserted here -->
+        </div>
+      </div>
+    </section>
+
+    <section id="contact-us" class="cta-section">
+      <div class="container text-center">
+        <h2 class="cta-title"></h2>
+        <p class="cta-description"></p>
+        <div class="cta-buttons">
+          <button class="btn btn-cta-primary" onclick="bookDemo()">
+            <i class="fa-solid fa-user-plus icon-user"></i
+            ><span class="signupNdemo-text"></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer" class="footer-section">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <i class="fa-solid fa-calendar-check footer-icon"></i>
+              <span class="footer-brand"></span>
+            </div>
+            <p class="footer-description"></p>
+            <div class="footer-socials"></div>
+          </div>
+
+          <div class="footer-links" data-section="product">
+            <h3 class="footer-title"></h3>
+            <ul class="footer-list"></ul>
+          </div>
+
+          <div class="footer-links" data-section="resources">
+            <h3 class="footer-title"></h3>
+            <ul class="footer-list"></ul>
+          </div>
+
+          <div class="footer-links" data-section="company">
+            <h3 class="footer-title"></h3>
+            <ul class="footer-list"></ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p class="footer-copy"></p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

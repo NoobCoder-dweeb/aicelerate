@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AICelerate - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/darkmode.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+
+</head>
+
+<body class="font-inter bg-gray-50 text-dark">
+  <!-- Main Application -->
+  <div class="min-h-screen flex flex-col">
+    <!-- Top Navigation -->
+    {% include "_header.html" %}
+
+    <div class="layout">
+      {% include "_sidebar.html" %}
+
+      <div class="main-content" id="main-content">
+        <div id="dashboard-page" class="dashboard-page">
+          <div class="page-header">
+            <h1>Dashboard</h1>
+            <!-- change to welcome username -->
+            <p>
+              Welcome back, Admin User! Here's an overview of your timetable
+              scheduling.
+            </p>
+          </div>
+
+          <div class="stats-grid">
+            <!-- Total Classrooms -->
+            <div class="card classrooms">
+              <div class="card-icon-wrapper">
+                <i class="fa-solid fa-building text-2xl"></i>
+              </div>
+              <p>Total Classrooms</p>
+              <h3>{{ classroom_count }}</h3>
+              <div class="card-footer"></div>
+            </div>
+
+            <!-- Total Lecturers -->
+            <div class="card lecturers">
+              <div class="card-icon-wrapper">
+                <i class="fa-solid fa-users text-2xl"></i>
+              </div>
+              <p>Total Lecturers</p>
+              <h3>{{ lecturer_count }}</h3>
+              <div class="card-footer"></div>
+            </div>
+
+            <!-- Total Subjects -->
+            <div class="card subjects">
+              <div class="card-icon-wrapper">
+                <i class="fa-solid fa-book text-2xl"></i>
+              </div>
+              <p>Total Subjects</p>
+              <h3>{{ subject_count }}</h3>
+              <div class="card-footer"></div>
+            </div>
+          </div>
+
+          <!-- Quick Action  -->
+          <div class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="quick-grid">
+              <a href="{{ url_for('classroom_bp.classroom') }}" class="quick-action classroom">
+                <div class="quick-action-icon">
+                  <i class="fa-solid fa-building text-2xl"></i>
+                </div>
+                <h4>Add Classroom</h4>
+                <p>Add a new classroom</p>
+              </a>
+
+              <a href="{{ url_for('lecturer_bp.lecturer') }}" class="quick-action user">
+                <div class="quick-action-icon">
+                  <i class="fa-solid fa-user-plus text-2xl"></i>
+                </div>
+                <h4>Add Lecturer</h4>
+                <p>Register a new lecturer</p>
+              </a>
+
+              <a href="{{ url_for('subject_bp.subject') }}" class="quick-action book">
+                <div class="quick-action-icon">
+                  <i class="fa-solid fa-book text-2xl"></i>
+                </div>
+                <h4>Add New Subject</h4>
+                <p>Create a new academic subject</p>
+              </a>
+
+              <a href="{{ url_for('generate_timetable_bp.generate_timetable') }}" class="quick-action magic">
+                <div class="quick-action-icon">
+                  <i class="fa-solid fa-magic text-2xl"></i>
+                </div>
+                <h4>Generate Timetable</h4>
+                <p>Create a new timetable</p>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+
+</html>

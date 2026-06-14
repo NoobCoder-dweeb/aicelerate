@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Login</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/login_admin.css') }}"
+    />
+  </head>
+  <body>
+    <div class="login-container">
+      <h2>Admin Login</h2>
+      {% if error %}
+      <div class="error">{{ error }}</div>
+      {% endif %}
+      <form method="POST" action="{{ url_for('admin_bp.admin') }}">
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter admin password"
+          required
+        />
+        <button type="submit">Login</button>
+      </form>
+    </div>
+    <script src="{{ url_for('static', filename='js/login_admin.js') }}"></script>
+  </body>
+</html>

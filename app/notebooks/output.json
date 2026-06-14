@@ -1,0 +1,179 @@
+{
+    "operations": {
+        "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+        ],
+        "working_hours": "0900-1800",
+        "lunch_break": "1200-1300"
+    },
+    "programmes": [
+        "Bachelor of Computer Science",
+        "Diploma in Information Technology"
+    ],
+    "classrooms": [
+        "Hall 1",
+        "Lab A",
+        "Lab C",
+        "M001",
+        "R201",
+        "R202"
+    ],
+    "lecturers": [
+        {
+            "lecturer_id": "CS01",
+            "lecturer_availability": [
+                1,
+                2,
+                3
+            ]
+        },
+        {
+            "lecturer_id": "L00002",
+            "lecturer_availability": [
+                1,
+                4
+            ]
+        },
+        {
+            "lecturer_id": "MC01",
+            "lecturer_availability": [
+                1,
+                3,
+                5
+            ]
+        }
+    ],
+    "subjects": [
+        {
+            "subject_id": "CS004",
+            "name": "Object-Oriented Programming",
+            "lecturer_id": "Caeley Yong",
+            "level": "Degree",
+            "duration": 3,
+            "classroom_id": "Lab C"
+        },
+        {
+            "subject_id": "CS005",
+            "name": "Database Systems",
+            "lecturer_id": "Low Jing Xuan",
+            "level": "Degree",
+            "duration": 2,
+            "classroom_id": "Lab A"
+        },
+        {
+            "subject_id": "CS006",
+            "name": "Computer Architecture and Organization",
+            "lecturer_id": "HENG WEI KEE",
+            "level": "Degree",
+            "duration": 3,
+            "classroom_id": "R201"
+        },
+        {
+            "subject_id": "CS008",
+            "name": "Artificial Intelligence",
+            "lecturer_id": "Dr. Aisha Patel",
+            "level": "Degree",
+            "duration": 4,
+            "classroom_id": "R201"
+        },
+        {
+            "subject_id": "CS010",
+            "name": "Cybersecurity and Cryptography",
+            "lecturer_id": "Dr. Aisha Patel",
+            "level": "Degree",
+            "duration": 4,
+            "classroom_id": "Hall 1",
+            "subject_availability": [
+                2,
+                3,
+                4,
+                5
+            ]
+        },
+        {
+            "subject_id": "CS012",
+            "name": "Cloud Computing",
+            "lecturer_id": "Prof. Michael Chen",
+            "level": "Degree",
+            "duration": 3,
+            "classroom_id": "Hall 1",
+            "subject_availability": [
+                1,
+                5
+            ]
+        },
+        {
+            "subject_id": "CS014",
+            "name": "Mobile Application Development",
+            "lecturer_id": "Prof. Michael Chen",
+            "level": "Degree",
+            "duration": 4,
+            "classroom_id": "Hall 1"
+        },
+        {
+            "subject_id": "CML3014N",
+            "name": "Machine Learning",
+            "lecturer_id": "Low Jing Xuan",
+            "level": "Degree",
+            "duration": 3
+        },
+        {
+            "subject_id": "CS001",
+            "name": "Introduction to Programming",
+            "lecturer_id": "HENG WEI KEE",
+            "level": "Diploma",
+            "duration": 3
+        },
+        {
+            "subject_id": "CS003",
+            "name": "Machine Learning Fundamentals",
+            "lecturer_id": "Prof. Michael Chen",
+            "level": "Degree",
+            "duration": 3,
+            "subject_availability": [
+                1,
+                2,
+                5
+            ]
+        },
+        {
+            "subject_id": "CS007",
+            "name": "Operating Systems",
+            "lecturer_id": "Caeley Yong",
+            "level": "Degree",
+            "duration": 3.5
+        },
+        {
+            "subject_id": "CS009",
+            "name": "Web Technologies and Development",
+            "lecturer_id": "Low Jing Xuan",
+            "level": "Degree",
+            "duration": 2
+        },
+        {
+            "subject_id": "CS011",
+            "name": "Parallel and Distributed Systems",
+            "lecturer_id": "Dr. Aisha Patel",
+            "level": "Degree",
+            "duration": 3
+        },
+        {
+            "subject_id": "CS013",
+            "name": "Data Mining and Analytics",
+            "lecturer_id": "HENG WEI KEE",
+            "level": "Degree",
+            "duration": 2
+        },
+        {
+            "subject_id": "CS015",
+            "name": "Final Year Project",
+            "lecturer_id": "Low Jing Xuan",
+            "level": "Degree",
+            "duration": 1
+        }
+    ]
+}

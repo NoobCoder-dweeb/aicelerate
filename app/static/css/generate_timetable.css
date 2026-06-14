@@ -1,0 +1,245 @@
+@layer utilities {
+    .section-expanded {
+        max-height: 1000px;
+        opacity: 1;
+        overflow: visible;
+    }
+
+    .section-collapsed {
+        opacity: 0.8;
+        overflow: hidden;
+    }
+
+    .drag-area {
+        min-height: 40px;
+        border: 2px dashed #CBD5E1;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .drag-area-active {
+        border-color: #165DFF;
+        background-color: rgba(22, 93, 255, 0.05);
+    }
+
+    .content-auto {
+        content-visibility: auto;
+    }
+
+    .progress-step {
+        transition: all 0.3s ease;
+    }
+
+    .card-transition {
+        transition: all 0.3s ease;
+    }
+
+    .hover-scale {
+        transition: transform 0.2s ease;
+    }
+
+    .hover-scale:hover {
+        transform: scale(1.02);
+    }
+
+    .subject-item,
+    .classroom-item {
+        cursor: grab;
+    }
+
+    .subject-item:active,
+    .classroom-item:active {
+        cursor: grabbing;
+    }
+
+    .drag-area .classroom-item {
+        color: #000000;
+        opacity: 1 !important;
+    }
+
+    .section-header {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .section-container.section-collapsed .section-description {
+        display: none;
+    }
+
+    .section-header>div:first-child {
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Timetable specific styles */
+    .timetable-table {
+        border-collapse: collapse;
+    }
+
+    .timetable-table th,
+    .timetable-table td {
+        border: 1px solid #d1d5db !important;
+        vertical-align: middle;
+    }
+
+    .timetable-table th {
+        background-color: #f9fafb;
+        font-weight: 600;
+    }
+
+    .timetable-table td {
+        min-height: 60px;
+        position: relative;
+    }
+
+    .timetable-table .subject-cell {
+        padding: 4px;
+        height: 100%;
+    }
+
+    .timetable-table .subject-content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .opacity-50 {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+}
+
+@tailwind utilities;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --color-primary: #165DFF;
+    --color-secondary: #36D399;
+    --color-neutral: #F3F4F6;
+    --color-dark: #1E293B;
+    --color-primary-light: #E6F7FF;
+    --color-neutral-light: #F9FAFB;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Timetable Layout with Sidebar */
+.timetable-layout-wrapper {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.timetable-container {
+    flex: 1;
+    overflow-x: auto;
+    border: 1px solid #d6d9e3;
+    border-radius: 8px;
+}
+
+.timetable-sidebar {
+    width: 220px;
+    border: 1px solid #d6d9e3;
+    border-radius: 8px;
+    padding: 12px;
+    background: #ffffff;
+    position: sticky;
+    top: 16px;
+    align-self: flex-start;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.sidebar-header h2 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2330;
+}
+
+.clear-batch-btn {
+    background: #f0f1f6;
+    border: 1px solid #d6d9e3;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clear-batch-btn:hover {
+    background: #e0e1e6;
+}
+
+.batch-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.batch-btn {
+    text-align: left;
+    background: #f8f8fb;
+    border: 1px solid #d6d9e3;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #1f2330;
+    font-weight: 500;
+}
+
+.batch-btn:hover {
+    background: #efeff5;
+    border-color: #1f2330;
+}
+
+.batch-btn.active {
+    border-color: #1f2330;
+    background: #1f2330;
+    color: #ffffff;
+}
+
+.batch-btn.highlight {
+    box-shadow: 0 0 0 2px rgba(31, 35, 48, 0.1);
+}
+
+/* Highlight class cells that belong to active batch */
+.event.batch-highlight {
+    background: #ffe08a !important;
+    border-color: #d69300 !important;
+    box-shadow: inset 0 0 0 2px #d69300 !important;
+}
+
+.event.batch-dim {
+    opacity: 0.4;
+}
+
+@media (max-width: 1200px) {
+    .timetable-layout-wrapper {
+        flex-direction: column;
+    }
+
+    .timetable-sidebar {
+        width: 100%;
+        position: static;
+        max-height: none;
+    }
+}

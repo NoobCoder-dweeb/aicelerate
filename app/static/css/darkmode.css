@@ -1,0 +1,35 @@
+/* darkmode.css */
+
+/* Global dark mode */
+.dark body {
+  background-color: #111827; /* slate-900 */
+  color: #f9fafb;
+}
+
+/* Sidebar */
+.dark .sidebar {
+  background-color: #1f2937; /* gray-800 */
+  color: #e5e7eb;
+}
+
+/* Navbar */
+.dark .navbar {
+  background-color: #0f172a; /* slate-900 */
+  color: #f9fafb;
+}
+
+/* Cards */
+.dark .card {
+  background-color: #1e293b; /* slate-800 */
+  color: #f1f5f9;
+  border: 1px solid #334155;
+}
+
+/* Buttons */
+.dark button {
+  background-color: #374151; /* gray-700 */
+  color: #f9fafb;
+}
+.dark button:hover {
+  background-color: #4b5563; /* gray-600 */
+}

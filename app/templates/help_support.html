@@ -1,0 +1,100 @@
+<!-- base.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AICelerate - Help and Support</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/Tagging-universal.css') }}"
+    />
+
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/tagging_universal.js') }}"></script>
+  </head>
+
+  <body class="bg-gray-100 h-screen flex flex-col">
+    {% include "_header.html" %}
+
+    <div class="flex flex-1 overflow-hidden">
+      {% include "_sidebar.html" %}
+
+
+      <div id="main-content" class="flex-1 overflow-y-auto bg-gray-50 p-6">
+        <div id = tagging-universal-page class="animate-fade-in">
+
+          <div class="max-w-3xl mx-auto  rounded-lg shadow-md p-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Help & Support</h1>
+            <p class="text-gray-600 mb-6">
+              Need help with tags or facing issues? We’ve got you covered.  
+              Reach out to us through the following channels:
+            </p>
+
+            <!-- Contact Info -->
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-envelope text-blue-600 text-xl"></i>
+                <span class="text-gray-700">Email: 
+                  <a href="mailto:support@example.com" class="text-blue-600 hover:underline">
+                    support@example.com
+                  </a>
+                </span>
+              </div>
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-phone text-green-600 text-xl"></i>
+                <span class="text-gray-700">Phone: 
+                  <a href="tel:+60123456789" class="text-blue-600 hover:underline">
+                    +60 12-345 6789
+                  </a>
+                </span>
+              </div>
+              <div class="flex items-center gap-3">
+                <i class="fa-brands fa-whatsapp text-green-500 text-xl"></i>
+                <span class="text-gray-700">WhatsApp: 
+                  <a href="https://wa.me/60123456789" class="text-blue-600 hover:underline">
+                    Chat with us
+                  </a>
+                </span>
+              </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="mt-10">
+              <h2 class="text-2xl font-semibold text-gray-800 mb-4">Frequently Asked Questions</h2>
+              <div class="space-y-4">
+                <details class="bg-gray-50 p-4 rounded-md shadow-sm">
+                  <summary class="cursor-pointer font-medium text-gray-700">How do I create a tag?</summary>
+                  <p class="mt-2 text-gray-600">Go to the Tagging page, enter the tag name, select options, and click <strong>Create Tag</strong>.</p>
+                </details>
+                <details class="bg-gray-50 p-4 rounded-md shadow-sm">
+                  <summary class="cursor-pointer font-medium text-gray-700">Can I delete multiple tags at once?</summary>
+                  <p class="mt-2 text-gray-600">Yes! Use the bulk delete feature by selecting multiple tags.</p>
+                </details>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+
+
+
+
+

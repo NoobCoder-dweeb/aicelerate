@@ -1,0 +1,51 @@
+<!-- Top Navigation -->
+
+<nav class="navbar">
+  <div class="navbar-left">
+    <button id="sidebar-toggle" class="sidebar-toggle">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="brand">
+      <i class="fa-solid fa-calendar-check brand-icon"></i>
+      <span>AICelerate</span>
+    </div>
+  </div>
+
+  <div class="navbar-right">
+    <div class="user-profile">
+      <div class="user-details">
+        <p>{{ current_user.id }}</p>
+        <form action="{{ url_for('auth_bp.logout') }}" method="post">
+          <button type="submit" class="logout-btn" id="logout-btn">Logout</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Universal Popup Message -->
+  <div id="popup-message" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center space-y-6">
+      <p id="popup-text" class="text-lg font-semibold text-gray-800">
+        Are you sure you want to log out?
+      </p>
+      <div class="flex justify-center gap-4">
+        <button id="popup-confirm" class="bg-red-600 text-white px-5 py-2 rounded font-semibold hover:bg-red-700 transition">
+          Yes, Logout
+        </button>
+        <button id="popup-close" class="bg-gray-300 text-black px-5 py-2 rounded font-semibold hover:bg-gray-400 transition">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+</nav>
+
+<script src="{{ url_for('static', filename='js/header.js') }}"></script>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/header.css') }}"
+/>
+
+

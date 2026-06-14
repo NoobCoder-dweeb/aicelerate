@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable Generation Result</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Timetable Generation Result</h1>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Request Data:</h2>
+            <pre id="request-data-display" class="bg-gray-100 p-4 rounded overflow-auto text-sm">Loading...</pre>
+        </div>
+    </div>
+
+    <script>
+        // Get data from sessionStorage
+        const timetableRequest = JSON.parse(sessionStorage.getItem('timetableRequest') || '{}');
+        
+        // Display the data
+        document.getElementById('request-data-display').textContent = JSON.stringify(timetableRequest, null, 2);
+        
+        // Clear sessionStorage after displaying
+        sessionStorage.removeItem('timetableRequest');
+    </script>
+</body>
+</html>

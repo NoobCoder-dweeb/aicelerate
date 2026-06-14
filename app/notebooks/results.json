@@ -1,0 +1,152 @@
+{
+    "CS005": {
+        "name": "Database Systems",
+        "classroom_id": "Lab A",
+        "day": "Friday",
+        "start": "09:00",
+        "end": "11:00",
+        "lecturer_id": "Low Jing Xuan",
+        "duration": 2.0,
+        "level": "Degree"
+    },
+    "CS006": {
+        "name": "Computer Architecture and Organization",
+        "classroom_id": "R201",
+        "day": "Friday",
+        "start": "09:00",
+        "end": "12:00",
+        "lecturer_id": "HENG WEI KEE",
+        "duration": 3.0,
+        "level": "Degree"
+    },
+    "CS011": {
+        "name": "Parallel and Distributed Systems",
+        "classroom_id": "Hall 1",
+        "day": "Friday",
+        "start": "09:00",
+        "end": "12:00",
+        "lecturer_id": "Dr. Aisha Patel",
+        "duration": 3.0,
+        "level": "Degree"
+    },
+    "CS012": {
+        "name": "Cloud Computing",
+        "classroom_id": "Hall 1",
+        "day": "Monday",
+        "start": "09:00",
+        "end": "12:00",
+        "lecturer_id": "Prof. Michael Chen",
+        "duration": 3.0,
+        "level": "Degree"
+    },
+    "CS015": {
+        "name": "Final Year Project",
+        "classroom_id": "Lab A",
+        "day": "Monday",
+        "start": "09:00",
+        "end": "10:00",
+        "lecturer_id": "Low Jing Xuan",
+        "duration": 1.0,
+        "level": "Degree"
+    },
+    "CS009": {
+        "name": "Web Technologies and Development",
+        "classroom_id": "Lab A",
+        "day": "Monday",
+        "start": "10:00",
+        "end": "12:00",
+        "lecturer_id": "Low Jing Xuan",
+        "duration": 2.0,
+        "level": "Degree"
+    },
+    "CS001": {
+        "name": "Introduction to Programming",
+        "classroom_id": "Hall 1",
+        "day": "Thursday",
+        "start": "09:00",
+        "end": "12:00",
+        "lecturer_id": "HENG WEI KEE",
+        "duration": 3.0,
+        "level": "Diploma"
+    },
+    "CS010": {
+        "name": "Cybersecurity and Cryptography",
+        "classroom_id": "Hall 1",
+        "day": "Thursday",
+        "start": "13:00",
+        "end": "17:00",
+        "lecturer_id": "Dr. Aisha Patel",
+        "duration": 4.0,
+        "level": "Degree"
+    },
+    "CS007": {
+        "name": "Operating Systems",
+        "classroom_id": "Lab A",
+        "day": "Thursday",
+        "start": "13:00",
+        "end": "16:30",
+        "lecturer_id": "Caeley Yong",
+        "duration": 3.5,
+        "level": "Degree"
+    },
+    "CML3014N": {
+        "name": "Machine Learning",
+        "classroom_id": "Lab A",
+        "day": "Tuesday",
+        "start": "09:00",
+        "end": "12:00",
+        "lecturer_id": "Low Jing Xuan",
+        "duration": 3.0,
+        "level": "Degree"
+    },
+    "CS003": {
+        "name": "Machine Learning Fundamentals",
+        "classroom_id": "Hall 1",
+        "day": "Tuesday",
+        "start": "09:00",
+        "end": "12:00",
+        "lecturer_id": "Prof. Michael Chen",
+        "duration": 3.0,
+        "level": "Degree"
+    },
+    "CS014": {
+        "name": "Mobile Application Development",
+        "classroom_id": "Hall 1",
+        "day": "Tuesday",
+        "start": "13:00",
+        "end": "17:00",
+        "lecturer_id": "Prof. Michael Chen",
+        "duration": 4.0,
+        "level": "Degree"
+    },
+    "CS004": {
+        "name": "Object-Oriented Programming",
+        "classroom_id": "Lab C",
+        "day": "Wednesday",
+        "start": "09:00",
+        "end": "12:00",
+        "lecturer_id": "Caeley Yong",
+        "duration": 3.0,
+        "level": "Degree"
+    },
+    "CS013": {
+        "name": "Data Mining and Analytics",
+        "classroom_id": "Hall 1",
+        "day": "Wednesday",
+        "start": "09:00",
+        "end": "11:00",
+        "lecturer_id": "HENG WEI KEE",
+        "duration": 2.0,
+        "level": "Degree"
+    },
+    "CS008": {
+        "name": "Artificial Intelligence",
+        "classroom_id": "R201",
+        "day": "Wednesday",
+        "start": "13:00",
+        "end": "17:00",
+        "lecturer_id": "Dr. Aisha Patel",
+        "duration": 4.0,
+        "level": "Degree"
+    }
+}

@@ -1,0 +1,198 @@
+
+    .content-auto {
+        content-visibility: auto;
+    }
+
+    .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-radius: 0.5rem;
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+    }
+
+    .sidebar-item:hover {
+        background-color: rgba(22, 93, 255, 0.1);
+    }
+
+    .sidebar-item.active {
+        background-color: rgba(22, 93, 255, 0.1);
+        color: #165DFF;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background-color: #165DFF;
+        color: white;
+        font-weight: 500;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        border-radius: 0.5rem;
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .btn-primary:hover {
+        background-color: rgba(22, 93, 255, 0.9);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        transform: translateY(-0.125rem);
+    }
+
+    .btn-secondary {
+        background-color: white;
+        border-width: 1px;
+        border-color: #d1d5db;
+        color: #1E293B;
+        font-weight: 500;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        border-radius: 0.5rem;
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+    }
+
+    .btn-secondary:hover {
+        background-color: #f9fafb;
+    }
+
+    .btn-danger {
+        background-color: #ef4444;
+        color: white;
+        font-weight: 500;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        border-radius: 0.5rem;
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+    }
+
+    .btn-danger:hover {
+        background-color: #dc2626;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+    }
+
+    .card:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .input-field {
+        width: 100%;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-width: 1px;
+        border-color: #d1d5db;
+        border-radius: 0.5rem;
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+    }
+
+    .input-field:focus {
+        --tw-ring-color: rgba(22, 93, 255, 0.5);
+        --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+        --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+        box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+        border-color: #165DFF;
+    }
+
+    .badge {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+        font-size: 0.75rem;
+        line-height: 1rem;
+        font-weight: 500;
+        border-radius: 9999px;
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .animate-slide-in {
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .lecturer-table {
+        width: 100%;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        text-align: left;
+    }
+
+    .lecturer-table th {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+        background-color: #f9fafb;
+        color: #4b5563;
+        font-weight: 600;
+    }
+
+    .lecturer-table td {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-bottom-width: 1px;
+        border-color: #f3f4f6;
+    }
+
+    .lecturer-table tr:hover {
+        background-color: #f9fafb;
+    }
+
+    

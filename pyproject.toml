@@ -17,6 +17,11 @@ dependencies = [
     "numpy==1.24.3",
     "pandas==2.0.3",
     "flask-cors>=5.0.1",
+    "google-cloud-firestore>=2.20.2",
+    "python-constraint>=1.4.0",
+    "pydantic>=2.11.9",
+    "ortools>=9.14.6206",
+    "pytest>=7.4.4",
 ]
 
 [project.optional-dependencies]
@@ -34,3 +39,8 @@ packages = ["app"]
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+]

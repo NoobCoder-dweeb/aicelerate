@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Timetable</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36D399',
+                        neutral: '#F3F4F6',
+                        dark: '#1E293B',
+                        'primary-light': '#E6F7FF',
+                        'neutral-light': '#F9FAFB'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/generate_timetable.css') }}" />
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <style>
+        .timetable-table {
+            font-size: 11px;
+        }
+
+        .timetable-table .sticky {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+        }
+
+        .timetable-table td,
+        .timetable-table th {
+            white-space: nowrap;
+            min-width: 70px;
+        }
+
+        .timetable-table .venue-col {
+            min-width: 120px;
+            max-width: 120px;
+        }
+    </style>
+
+</head>
+
+<body class="font-inter bg-gray-50 text-dark min-h-screen flex flex-col">
+    <!-- Page Header -->
+    {% include "_header.html" %}
+
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar -->
+        {% include "_sidebar.html" %}
+
+        <!-- Main Content -->
+        <main class="flex-1 max-w-7xl mx-auto px-4 py-8">
+            <div class="mb-8">
+                <h1 class="text-[clamp(1.75rem,3vw,2.5rem)] font-bold text-dark">Generate Timetable</h1>
+                <p class="text-gray-500 mt-2">Complete the following sections step-by-step to generate your timetable
+                </p>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="mb-10 relative">
+                <!-- Progress Bar -->
+                <div class="absolute top-1/3 left-0 right-0 h-2 bg-gray-200 -translate-y-1/2 z-0 rounded-full"></div>
+                <div class="absolute top-1/3 left-0 h-2 bg-primary -translate-y-1/2 z-10 transition-all duration-500 rounded-full"
+                    style="width: 0%" id="progress-bar"></div>
+
+                <!-- Steps -->
+                <div class="flex justify-between w-full relative z-20">
+                    <div class="flex flex-col items-center progress-step">
+                        <div
+                            class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-medium text-lg shadow-lg step-indicator active mb-2">
+                            1</div>
+                        <span class="text-sm font-medium">Departments</span>
+                    </div>
+                    <div class="flex flex-col items-center progress-step">
+                        <div
+                            class="w-12 h-12 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-medium text-lg shadow-md step-indicator mb-2">
+                            2</div>
+                        <span class="text-sm text-gray-500 font-medium">Programs</span>
+                    </div>
+                    <div class="flex flex-col items-center progress-step">
+                        <div
+                            class="w-12 h-12 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-medium text-lg shadow-md step-indicator mb-2">
+                            3</div>
+                        <span class="text-sm text-gray-500 font-medium">Subjects & Classrooms</span>
+                    </div>
+                    <div class="flex flex-col items-center progress-step">
+                        <div
+                            class="w-12 h-12 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-medium text-lg shadow-md step-indicator mb-2">
+                            4
+                        </div>
+                        <span class="text-sm text-gray-500 font-medium">Customization</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 1: Departments Selection -->
+            <section
+                class="bg-white rounded-2xl shadow-card mb-8 overflow-hidden section-container section-expanded card-transition hover:shadow-card-hover"
+                id="section-1">
+                <div class="p-6 cursor-pointer section-header" data-section="1">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center mr-3">
+                                <i class="fa-solid fa-building text-primary"></i>
+                            </div>
+                            <h2 class="text-xl font-semibold">Section 1: Select Departments</h2>
+                        </div>
+                        <i
+                            class="fa-solid fa-chevron-down text-gray-500 transition-transform duration-300 section-icon"></i>
+                    </div>
+                    <p class="text-gray-500 mt-1 section-description">Select the department to include in the timetable
+                        (only one)</p>
+                </div>
+
+                <div class="p-6 section-content">
+                    <div class="space-y-6">
+                        <div class="bg-neutral-light rounded-xl p-4">
+                            <p class="text-gray-600 text-sm mb-3">Select the academic department:</p>
+                            <!-- Departments (dynamically loaded from database) -->
+                            <div id="department-filters" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {% for dept in tagging_departments %}
+                                <label
+                                    class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer hover-scale transition-all">
+                                    <input type="radio" name="departments" value="{{ dept.id }}"
+                                        class="mr-3 h-5 w-5 text-primary rounded-full border-gray-300 focus:ring-primary">
+                                    <span class="font-medium">{{ dept.id }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-end">
+                            <button type="button" id="section-1-proceed"
+                                class="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary/90 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-md transition-all flex items-center">
+                                Proceed to Section 2 <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Program Selection -->
+            <section
+                class="bg-white rounded-2xl shadow-card mb-8 overflow-hidden section-container section-collapsed card-transition hover:shadow-card-hover"
+                id="section-2">
+                <div class="p-6 cursor-pointer section-header opacity-50" data-section="2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center mr-3">
+                                <i class="fa-solid fa-book text-primary"></i>
+                            </div>
+                            <h2 class="text-xl font-semibold">Section 2: Select Programs</h2>
+                        </div>
+                        <i
+                            class="fa-solid fa-chevron-down text-gray-500 transition-transform duration-300 section-icon"></i>
+                    </div>
+                    <p class="text-gray-500 mt-1 section-description">Select the programs to include (based on selected
+                        department)</p>
+                </div>
+
+                <div class="p-6 section-content hidden">
+                    <div class="space-y-6">
+                        <div class="bg-neutral-light rounded-xl p-4">
+                            <p class="text-gray-600 text-sm mb-3">Select one or more programs:</p>
+                            <!-- Programs (dynamically loaded based on selected department) -->
+                            <div id="program-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+                                {% for programme in tagging_programmes %}
+                                <label
+                                    class="program-item flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer hover-scale transition-all"
+                                    data-department="{{ programme.department }}">
+                                    <input type="checkbox" name="programs" value="{{ programme.name }}"
+                                        class="form-checkbox h-5 w-5 text-blue-600">
+                                    <span class="font-medium">{{ programme.name }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-between">
+                            <button type="button" id="section-2-back"
+                                class="border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-50 transition-all flex items-center">
+                                <i class="fa-solid fa-arrow-left mr-2"></i> Back to Section 1
+                            </button>
+                            <button type="button" id="section-2-proceed"
+                                class="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary/90 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-md transition-all flex items-center">
+                                Proceed to Section 3 <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Subjects & Classrooms Assignment -->
+            <section
+                class="bg-white rounded-2xl shadow-card mb-10 overflow-hidden section-container section-collapsed card-transition hover:shadow-card-hover"
+                id="section-3">
+                <div class="p-6 cursor-pointer section-header opacity-50" data-section="3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center mr-3">
+                                <i class="fa-solid fa-clipboard-list text-primary"></i>
+                            </div>
+                            <h2 class="text-xl font-semibold">Section 3: Assign Classrooms to Subjects</h2>
+                        </div>
+                        <i
+                            class="fa-solid fa-chevron-down text-gray-500 transition-transform duration-300 section-icon"></i>
+                    </div>
+                    <p class="text-gray-500 mt-1 section-description">Drag and drop classrooms to assign them to
+                        subjects</p>
+                </div>
+
+                <div class="p-6 section-content hidden">
+                    <div class="space-y-6">
+                        <!-- Three-column layout -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Column 1: Available Subjects -->
+                            <div class="bg-neutral-light rounded-xl p-5">
+                                <h3 class="font-medium text-lg mb-4 flex items-center">
+                                    <i class="fa-solid fa-book-open text-primary mr-2"></i>
+                                    Available Subjects
+                                </h3>
+                                <div class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                                    {% for subject in subjects %}
+                                    <div class="p-4 border border-gray-200 rounded-xl bg-white subject-item"
+                                        data-subject="{{ subject.name | lower | replace(' ', '-') }}">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <p class="font-medium">{{ subject.name }}</p>
+                                                <p class="text-sm text-gray-500">{{ subject.subject_id }}</p>
+                                            </div>
+                                            <span
+                                                class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
+                                                {{ subject.credits }} credits
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Column 2: Assigned Classrooms -->
+                            <div class="bg-neutral-light rounded-xl p-5">
+                                <h3 class="font-medium text-lg mb-4 flex items-center">
+                                    <i class="fa-solid fa-map-marker-alt text-primary mr-2"></i>
+                                    Assigned Classrooms
+                                </h3>
+                                <div class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                                    <!-- First show subjects with pre-assigned classrooms -->
+                                    {% for subject in subjects %}
+                                    {% if (not selected_programs or (subject.get('programme') in selected_programs)) and
+                                    subject.classroom and subject.classroom != "Random" %}
+                                    <div class="p-4 border border-gray-200 rounded-xl bg-white flex flex-col">
+                                        <div class="mb-3">
+                                            <p class="font-medium">{{ subject.name }}</p>
+                                            <p class="text-sm text-gray-500">{{ subject.subject_id }}</p>
+                                        </div>
+                                        <div class="w-full drag-area"
+                                            data-assign="{{ subject.name | lower | replace(' ', '-') }}">
+                                            <!-- Pre-assigned classroom -->
+                                            {% set matched_classrooms = (classrooms | selectattr('id', 'equalto',
+                                            subject.classroom) | list) %}
+                                            {% set classroom_info = matched_classrooms[0] if matched_classrooms else
+                                            None %}
+                                            <div class="p-3 border border-gray-200 rounded-xl bg-white cursor-move hover-scale"
+                                                draggable="true">
+                                                <div class="flex justify-between items-start">
+                                                    <div>
+                                                        <p class="font-large">{{ subject.classroom }}</p>
+                                                        <p class="font-medium text-gray-500">{{ classroom_info.name if
+                                                            classroom_info else '' }}</p>
+                                                        <p class="text-sm text-gray-500">Capacity: {{
+                                                            classroom_info.capacity if classroom_info else 'N/A' }}</p>
+                                                    </div>
+                                                    <span
+                                                        class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                                        Assigned
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+
+                                    <!-- Then show subjects without pre-assigned classrooms -->
+                                    {% for subject in subjects %}
+                                    {% if (not selected_programs or (subject.get('programme') in selected_programs)) and
+                                    (not subject.classroom or subject.classroom == "Random") %}
+                                    <div class="p-4 border border-gray-200 rounded-xl bg-white flex flex-col">
+                                        <div class="mb-3">
+                                            <p class="font-medium">{{ subject.name }}</p>
+                                            <p class="text-sm text-gray-500">{{ subject.subject_id }}</p>
+                                        </div>
+                                        <div class="w-full drag-area"
+                                            data-assign="{{ subject.name | lower | replace(' ', '-') }}">
+                                            <!-- Empty drop zone -->
+                                            <div class="text-center text-gray-400 text-sm py-2">
+                                                Drop classroom here or leave it blank for random assignment
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Column 3: Available Classrooms -->
+                            <div class="bg-neutral-light rounded-xl p-5">
+                                <h3 class="font-medium text-lg mb-4 flex items-center">
+                                    <i class="fa-solid fa-building text-primary mr-2"></i>
+                                    Available Classrooms
+                                </h3>
+                                <div class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                                    {% for classroom in classrooms %}
+                                    <div class="p-4 border border-gray-200 rounded-xl bg-white cursor-move classroom-item hover-scale"
+                                        draggable="true" data-classroom="{{ classroom.id }}">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <p class="font-large">{{ classroom.id }}</p>
+                                                <p class="font-medium text-gray-500">{{ classroom.name }}</p>
+                                                <p class="text-sm text-gray-500">Capacity: {{ classroom.capacity }}</p>
+                                            </div>
+                                            <span
+                                                class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                                {{ classroom.type }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-between">
+                            <button type="button" id="section-3-back"
+                                class="border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-50 transition-all flex items-center shadow-sm">
+                                <i class="fa-solid fa-arrow-left mr-2"></i> Back to Section 2
+                            </button>
+
+                            <button type="button" id="section-3-proceed"
+                                class="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary/90 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-md transition-all flex items-center">
+                                Proceed to Section 4 <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
+
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5 Customization -->
+
+            <section id="section-5-customization"
+                class="bg-white rounded-2xl shadow-card mb-10 overflow-hidden section-container section-collapsed card-transition hover:shadow-card-hover">
+                <!-- HEADER (same structure as Section 3) -->
+                <div class="p-6 cursor-pointer section-header opacity-50" data-section="5-customization">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center mr-3">
+                                <i class="fa-solid fa-sliders text-primary"></i>
+                            </div>
+                            <h2 class="text-xl font-semibold">Section 4: Customization</h2>
+                        </div>
+                        <i
+                            class="fa-solid fa-chevron-down text-gray-500 transition-transform duration-300 section-icon"></i>
+                    </div>
+                    <p class="text-gray-500 mt-1 section-description">
+                        Customize According to Availability
+                    </p>
+                </div>
+
+
+                <div class="p-6 section-content hidden">
+                    <div class="space-y-6">
+                        <!-- AVAILABILITY CONSTRAINTS -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                                Availability Constraints
+                            </h3>
+
+                            <!-- Working Days -->
+                            <div class="mb-8">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Working Days</h3>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex flex-wrap gap-3">
+                                        {% for day, value in [('Monday', 'mon'), ('Tuesday', 'tue'), ('Wednesday', 'wed'),
+                      ('Thursday', 'thu'), ('Friday', 'fri'), ('Saturday', 'sat'), ('Sunday', 'sun')] %}
+<label
+    class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 cursor-pointer transition">
+    <input type="checkbox" class="w-5 h-5 rounded text-blue-600 working-day-checkbox"
+        value="{{ value }}" {% if loop.index <=5 %}checked{% endif %} />
+    <span>{{ day }}</span>
+</label>
+{% endfor %}
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Working Hours -->
+                            <div class="mb-8">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                                    Working Hours
+                                </h3>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <p class="text-sm text-gray-600 mb-3">
+                                        Applies to all selected working days
+                                    </p>
+                                    <div class="flex flex-wrap items-center gap-4">
+                                        <div class="flex-1 max-w-md">
+                                            <div class="flex items-center gap-3">
+                                                <input type="time"
+                                                    class="flex-1 p-3 border border-gray-300 rounded-md text-gray-800"
+                                                    value="08:00" />
+                                                <span class="text-gray-500 text-lg font-medium">-</span>
+                                                <input type="time"
+                                                    class="flex-1 p-3 border border-gray-300 rounded-md text-gray-800"
+                                                    value="17:00" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Lunch Time -->
+                            <div class="mb-8">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Lunch Break</h3>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex flex-wrap items-center gap-4">
+                                        <div class="flex-1 min-w-[200px]">
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Lunch
+                                                Time</label>
+                                            <div class="flex items-center gap-2">
+                                                <input type="time" class="flex-1 p-2 border border-gray-300 rounded-md"
+                                                    value="12:00" />
+                                                <span class="text-gray-500">-</span>
+                                                <input type="time" class="flex-1 p-2 border border-gray-300 rounded-md"
+                                                    value="13:00" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Lecturer Constraints -->
+                            <div class="mb-6">
+                                <h4 class="text-lg font-medium text-gray-700 mb-3">
+                                    Lecturer Availability
+                                </h4>
+                                <div id="lecturer-constraints-container" class="space-y-3">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <div class="flex flex-wrap items-end gap-4">
+                                            <div class="flex-1 min-w-[200px]">
+                                                <label
+                                                    class="block text-sm font-medium text-gray-700 mb-2">Lecturer</label>
+                                                <select id="lecturer-select"
+                                                    class="w-full p-2 border border-gray-300 rounded-md mt-4">
+                                                    <option value="">Select lecturer</option>
+                                                    {% for lecturer in lecturers %}
+                                                    <option value="{{ lecturer.staff_id }}"
+                                                        data-department="{{ lecturer.department }}">
+                                                        {{ lecturer.name }} (ID: {{ lecturer.staff_id }})
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+
+                                            <div class="flex-1 min-w-[200px]">
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">Not
+                                                    Available On</label>
+                                                <div class="flex flex-wrap gap-2">
+                                                    {% for day_short, day_full in
+                                                    {'Mon':'Mon','Tue':'Tue','Wed':'Wed','Thu':'Thu','Fri':'Fri'}.items()
+                                                    %}
+                                                    <label
+                                                        class="inline-flex items-center gap-1 px-3 py-1 border border-gray-300 rounded-full text-sm">
+                                                        <input type="checkbox" value="{{ day_short }}"
+                                                            class="day-checkbox rounded text-blue-600" />
+                                                        {{ day_full }}
+                                                    </label>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="button" id="add-lecturer-constraint"
+                                    class="mt-3 px-4 py-2 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition flex items-center gap-2">
+                                    <i class="fa fa-plus"></i>
+                                    <span>Add Lecturer Constraint</span>
+                                </button>
+
+                                <div id="lecturer-constraints-list" class="mt-4 space-y-2"></div>
+                            </div>
+
+                            <!-- Subject Constraints -->
+                            <div>
+                                <h4 class="text-lg font-medium text-gray-700 mb-3">
+                                    Subject Schedule Constraints
+                                </h4>
+                                <div id="subject-constraints-container" class="space-y-3">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <div class="flex flex-wrap items-end gap-4">
+                                            <div class="flex-1 min-w-[200px]">
+                                                <label
+                                                    class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                                                <select id="subject-select"
+                                                    class="w-full p-2 border border-gray-300 rounded-md">
+                                                    <option value="">Select subject</option>
+                                                    {% for subject in subjects %}
+                                                    <option value="{{ subject.subject_id }}"
+                                                        data-program="{{ subject.programme }}">
+                                                        {{ subject.name }} (ID: {{ subject.subject_id }})
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+
+                                            <div class="flex-1 min-w-[200px]">
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">Cannot Be
+                                                    Scheduled On</label>
+                                                <div class="flex flex-wrap gap-2">
+                                                    {% for day_short, day_full in
+                                                    {'Mon':'Mon','Tue':'Tue','Wed':'Wed','Thu':'Thu','Fri':'Fri'}.items()
+                                                    %}
+                                                    <label
+                                                        class="inline-flex items-center gap-1 px-3 py-1 border border-gray-300 rounded-full text-sm">
+                                                        <input type="checkbox" value="{{ day_short }}"
+                                                            class="subject-day-checkbox rounded text-blue-600" />
+                                                        {{ day_full }}
+                                                    </label>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+
+                                            <div class="flex-shrink-0">
+                                                <button type="button" class="text-red-500 hover:text-red-700 p-2">
+                                                    <i class="fa fa-trash-o text-xl"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="button" id="add-subject-constraint"
+                                    class="mt-3 px-4 py-2 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition flex items-center gap-2">
+                                    <i class="fa fa-plus"></i>
+                                    <span>Add Subject Constraint</span>
+                                </button>
+
+                                <div id="subject-constraints-list" class="mt-4 space-y-2"></div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Buttons -->
+                        <div class="mt-6 flex justify-between">
+                            <button type="button" id="section-5-back"
+                                class="border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-50 transition-all flex items-center shadow-sm">
+                                <i class="fa-solid fa-arrow-left mr-2"></i> Back to Section 3
+                            </button>
+
+                            <button type="button" id="generate-timetable"
+                                class="bg-green-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-md transition-all flex items-center">
+                                <i class="fa-solid fa-magic mr-2"></i> Generate Timetable
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+            <!-- Section 4: Generated Timetable Results -->
+            <section id="section-4"
+                class="hidden bg-white rounded-2xl shadow-card mb-10 overflow-hidden card-transition">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center mr-3">
+                                <i class="fa-solid fa-calendar-check text-primary"></i>
+                            </div>
+                            <h2 class="text-xl font-semibold">Generated Timetable Results</h2>
+                        </div>
+                        <button id="download-timetable"
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-all">
+                            <i class="fa-solid fa-download mr-2"></i> Download as XLSX
+                        </button>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div id="success-message"
+                        class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
+                        <i class="fa-solid fa-check-circle text-green-600 text-xl mr-3"></i>
+                        <div>
+                            <h3 class="font-semibold text-green-800">Timetable Generated Successfully!</h3>
+                            <p class="text-green-700 text-sm" id="success-description">Your timetable has been generated
+                                based on your requirements.</p>
+                        </div>
+                    </div>
+
+                    <!-- Generated Timetable Display -->
+                    <div class="bg-neutral-light rounded-xl p-6">
+                        <h3 class="font-medium text-lg mb-4">Generated Timetable:</h3>
+                        <div id="generated-data" class="bg-white rounded-lg border border-gray-200">
+                            <!-- Timetable table will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Inject subjects and classrooms data from backend
+        window.subjectsData = {{ subjects | tojson }};
+        window.classroomsData = {{ classrooms | tojson }};
+        window.taggingSubjectsData = {{ tagging_subjects | tojson }};
+        window.lecturersData = {{ lecturers | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/generate_timetable.js') }}"></script>
+</body>
+
+</html>

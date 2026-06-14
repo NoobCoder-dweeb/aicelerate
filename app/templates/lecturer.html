@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AICelerate - Lecturers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#165DFF",
+              secondary: "#36D399",
+              accent: "#FF6B35",
+              dark: "#1E293B",
+              light: "#F8FAFC",
+            },
+            fontFamily: {
+              inter: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/lecturer.css') }}"
+    />
+  </head>
+  <body class="font-inter bg-gray-50 text-dark">
+    <!-- Main Application -->
+    <div class="min-h-screen flex flex-col">
+      <!-- Top Navigation -->
+      {% include "_header.html" %}
+
+      <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar -->
+        {% include "_sidebar.html" %}
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto bg-gray-50 p-6" id="main-content">
+          <!-- Lecturers Page -->
+          <div id="lecturers-page" class="animate-fade-in">
+            <div class="mb-6">
+              <h1 class="text-2xl font-bold text-dark mb-2">
+                Lecturer Management
+              </h1>
+              <p class="text-gray-600">
+                Manage all your academic staff and their availability
+              </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+              <button id="add-lecturer-btn" class="btn-primary flex-1">
+                <i class="fa-solid fa-plus mr-2"></i>Add New Lecturer
+              </button>
+              <button id="upload-csv-btn" class="btn-secondary flex-1">
+                <i class="fa-solid fa-upload mr-2"></i>Upload CSV
+              </button>
+            </div>
+
+            <!-- Lecturers Table -->
+            <div class="card">
+              <div
+                class="flex flex-col md:flex-row md:items-center md:justify-between mb-6"
+              >
+                <h3 class="text-lg font-semibold mb-4 md:mb-0">
+                  All Lecturers
+                </h3>
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <div class="relative">
+                    <select class="input-field pr-10 appearance-none" id="department-filter">
+                      {% for department in departments %}
+                        <option value="{{ department.id }}">{{ department.name }}</option>
+                      {% endfor %}
+                    </select>
+                    <i
+                      class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                    ></i>
+                  </div>
+                  <div class="relative">
+                    <select class="input-field pr-10 appearance-none" id="position-filter">
+                      <option value="">All Positions</option>
+                      <option>Head of Department</option>
+                      <option>Program Leader</option>
+                      <option>Full Time Lecturer</option>
+                      <option>Part Time Lecturer</option>
+                    </select>
+                    <i
+                      class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                    ></i>
+                  </div>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto">
+                <!-- Bulk Actions Bar -->
+                <div
+                  id="lecturer-bulk-actions"
+                  class="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg hidden"
+                >
+                  <div class="text-sm text-gray-600">
+                    <span id="lecturer-selected-count">0</span> items selected
+                  </div>
+                  <button
+                    id="lecturer-bulk-delete-btn"
+                    class="btn-danger flex items-center"
+                  >
+                    <i class="fa-solid fa-trash mr-2"></i> Delete Selected
+                  </button>
+                </div>
+
+                <table class="lecturer-table">
+                  <thead>
+                    <tr>
+                      <th>
+                        <input type="checkbox" id="lecturer-select-all" />
+                      </th>
+                      <th>Staff ID</th>
+                      <th>Name</th>
+                      <th>Department</th>
+                      <th>Position</th>
+                      <th>Description</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="lecturer-table-body">
+                    {% for lecturer in lecturers %}
+                    <tr data-id="{{ lecturer.staff_id }}">
+                      <td>
+                        <input
+                          type="checkbox"
+                          class="lecturer-checkbox"
+                          value="{{ lecturer.staff_id }}"
+                        />
+                      </td>
+                      <td>{{ lecturer.staff_id }}</td>
+                      <td>{{ lecturer.name }}</td>
+                      <td>{{ lecturer.department }}</td>
+                      <td>{{ lecturer.position }}</td>
+                      <td>{{ lecturer.description }}</td>
+                      <td>
+                        <div class="row-actions">
+                          <button
+                            class="edit-btn text-primary hover:text-primary/80 mr-3"
+                            onclick="editLecturer('{{ lecturer.staff_id }}')"
+                          >
+                            <i class="fa-solid fa-pencil"></i>
+                          </button>
+                          <button
+                            class="delete-btn text-red-500 hover:text-red-600"
+                            onclick="showDeleteLecturerModal('{{ lecturer.staff_id }}')"
+                          >
+                            <i class="fa-solid fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ----------------------------- Add Lecturer Modal ---------------------------------------------------------------- -->
+    <div
+      id="add-lecturer-modal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden"
+    >
+      <div
+        class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 animate-fade-in"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-dark">Add New Lecturer</h2>
+          <button
+            id="close-add-lecturer"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+        <div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label for="lecturer-staff-id" class="block text-sm font-medium text-gray-700 mb-1">Staff ID</label>
+              <input type="text" id="lecturer-staff-id" class="input-field" placeholder="e.g., L00123" />
+              <div class="error-message hidden text-red-500 text-sm mt-1" id="lecturer-staff-id-error">
+                * required
+              </div>
+            </div>
+            <div>
+              <label for="lecturer-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input type="text" id="lecturer-name" class="input-field" placeholder="e.g., John Doe" />
+              <div class="error-message hidden text-red-500 text-sm mt-1" id="lecturer-name-error">
+                * required
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label for="lecturer-department" class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+              <select id="lecturer-department" class="input-field">
+                <option value="" disabled selected>Select Department</option>
+                {% for department in departments %}
+                  <option value="{{ department.id }}">{{ department.name }}</option>
+                {% endfor %}
+              </select>
+              <div class="error-message hidden text-red-500 text-sm mt-1" id="lecturer-department-error">
+                * required
+              </div>
+            </div>
+            <div>
+              <label for="lecturer-position" class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+              <select id="lecturer-position" class="input-field">
+                <option value="" disabled selected>Select Position</option>
+                <option>Head of Department</option>
+                <option>Program Leader</option>
+                <option>Full Time Lecturer</option>
+                <option>Part Time Lecturer</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label for="lecturer-description" class="block text-sm font-medium text-gray-700 mb-1">Description   （optional）</label>
+            <textarea id="lecturer-description" class="input-field" rows="3" placeholder="Additional information about the lecturer"></textarea>
+          </div>
+          <div class="flex justify-end gap-3">
+            <button type="button" id="cancel-add-lecturer" class="btn-secondary">Cancel</button>
+            <button type="button" id="add-lecturer-save-btn" class="btn-primary">
+              <i class="fa-solid fa-plus mr-2"></i>Add Lecturer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Lecturer Modal -->
+    <div
+      id="edit-lecturer-modal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden"
+    >
+      <div
+        class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 animate-fade-in"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-dark">Edit Lecturer</h2>
+          <button
+            id="close-edit-lecturer"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+        <input type="hidden" id="edit-lecturer-id" />
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="edit-lecturer-staff-id" class="block text-sm font-medium text-gray-700 mb-1">Staff ID</label>
+            <input type="text" id="edit-lecturer-staff-id" class="input-field bg-gray-100 text-gray-500 cursor-not-allowed" readonly />
+            <div class="error-message hidden text-red-500 text-sm mt-1" id="edit-lecturer-staff-id-error">
+              * required
+            </div>
+          </div>
+          <div>
+            <label for="edit-lecturer-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+            <input type="text" id="edit-lecturer-name" class="input-field" />
+            <div class="error-message hidden text-red-500 text-sm mt-1" id="edit-lecturer-name-error">
+              * required
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="edit-lecturer-department" class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+            <select id="edit-lecturer-department" class="input-field">
+              <option value="" disabled selected>Select Department</option>
+              {% for department in departments %}
+                <option value="{{ department.id }}">{{ department.name }}</option>
+              {% endfor %}
+            </select>
+            <div class="error-message hidden text-red-500 text-sm mt-1" id="edit-lecturer-department-error">
+              * required
+            </div>
+          </div>
+          <div>
+            <label for="edit-lecturer-position" class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+            <select id="edit-lecturer-position" class="input-field">
+              <option value="" disabled selected>Select Position</option>
+              <option>Head of Department</option>
+              <option>Program Leader</option>
+              <option>Full Time Lecturer</option>
+              <option>Part Time Lecturer</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="edit-lecturer-description" class="block text-sm font-medium text-gray-700 mb-1">Description   (optional)</label>
+          <textarea id="edit-lecturer-description" class="input-field" rows="3"></textarea>
+        </div>
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <button type="button" id="cancel-edit-lecturer" class="btn-secondary">Cancel</button>
+          <button type="button" id="edit-lecturer-save-btn" class="btn-primary">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete confirmation modal -->
+    <div id="delete-lecturer-modal" class="hidden fixed z-50 left-0 top-0 w-full h-full bg-gray-900/50 flex items-center justify-center">
+      <div class="bg-gray-50 p-4 rounded-md shadow-md text-center">
+        <h2>Confirm deletion</h2>
+        <p>Are you sure you want to delete this lecturer?</p>
+        <div class="flex gap-4 justify-center">
+          <button id="confirm-delete-lecturer" class="bg-red-600 text-white px-5 py-2 rounded font-semibold hover:bg-red-700 transition">
+            Delete
+          </button>
+          <button id="cancel-delete-lecturer" class="bg-gray-300 text-black px-5 py-2 rounded font-semibold hover:bg-gray-400 transition">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    
+    <!-- ----------------------------------Upload CSV Modal--------------------------------------------------------------------- -->
+    <div
+      id="upload-csv-modal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden"
+    >
+      <div
+        class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 animate-fade-in"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-dark">Upload Lecturers CSV</h2>
+          <button
+            id="close-upload-csv"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+        <div class="text-center mb-6">
+          <div
+            class="border-2 border-dashed border-gray-300 rounded-xl p-8 cursor-pointer hover:border-primary transition-colors duration-200"
+            id="drop-area"
+          >
+            <i class="fa-solid fa-cloud-upload text-4xl text-gray-400 mb-4"></i>
+            <h3 class="text-lg font-medium mb-2">
+              Drag & Drop your CSV file here
+            </h3>
+            <p class="text-gray-500 mb-4">or click to browse files</p>
+            <button class="btn-primary" id="browse-files-btn">
+              <i class="fa-solid fa-folder-open mr-2"></i>Browse Files
+            </button>
+            <input
+              type="file"
+              class="hidden"
+              id="file-input"
+              accept=".csv"
+            />
+
+            <!-- File name display -->
+            <div id="file-info" class="mt-4 hidden">
+              <div class="bg-gray-50 p-3 rounded-lg flex items-center">
+                <i class="fa-solid fa-file-lines text-primary mr-2"></i>
+                <span id="file-name" class="truncate"></span>
+                <button
+                  id="remove-file"
+                  class="ml-auto text-gray-400 hover:text-red-500"
+                >
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mb-6">
+          <h3 class="text-lg font-medium mb-3">CSV Format Requirements</h3>
+          <ul class="space-y-2 text-gray-600">
+            <li class="flex items-start">
+              <i class="fa-solid fa-check-circle text-secondary mt-1 mr-2"></i>
+              <span>CSV format only</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fa-solid fa-check-circle text-secondary mt-1 mr-2"></i>
+              <span>Column order: StaffID, Name, Department, Position, Description (optional)</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fa-solid fa-check-circle text-secondary mt-1 mr-2"></i>
+              <span>Valid positions: Head of Department, Program Leader, Full Time Lecturer, Part Time Lecturer</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fa-solid fa-check-circle text-secondary mt-1 mr-2"></i>
+              <span>No header row required - data starts from first row</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fa-solid fa-check-circle text-secondary mt-1 mr-2"></i>
+              <span>Maximum file size: 5MB</span>
+            </li>
+          </ul>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button type="button" id="cancel-upload-csv" class="btn-secondary">
+            Cancel
+          </button>
+          <button type="button" id="upload-file-btn" class="btn-primary">
+            <i class="fa-solid fa-upload mr-2"></i>Upload CSV & Import
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lecturer Popup Message -->
+    <div
+      id="lec-popup-message"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden"
+    >
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 animate-fade-in">
+        <div class="text-center">
+          <p id="lec-popup-text" class="text-gray-800 mb-4"></p>
+          <div class="flex justify-center gap-3">
+            <button
+              id="lec-popup-confirm"
+              class="btn-primary hidden"
+            >
+              OK
+            </button>
+            <button
+              id="lec-popup-close"
+              class="btn-secondary hidden"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/lecturer.js') }}"></script>
+  </body>
+</html>

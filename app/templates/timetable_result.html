@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AICelerate - Generate Timetable</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36D399',
+                        accent: '#FF6B35',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .sidebar-item {
+                @apply flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-primary/10;
+            }
+            .sidebar-item.active {
+                @apply bg-primary/10 text-primary font-medium;
+            }
+            .btn-primary {
+                @apply bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+            }
+            .btn-secondary {
+                @apply bg-white border border-gray-300 hover:bg-gray-50 text-dark font-medium py-2 px-4 rounded-lg transition-all duration-200;
+            }
+            .btn-danger {
+                @apply bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200;
+            }
+            .btn-outline {
+                @apply bg-transparent border border-primary text-primary hover:bg-primary/10 font-medium py-2 px-4 rounded-lg transition-all duration-200;
+            }
+            .card {
+                @apply bg-white rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg;
+            }
+            .input-field {
+                @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all duration-200;
+            }
+            .tag-badge {
+                @apply px-3 py-1 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer;
+            }
+            .tag-badge-blue { @apply bg-primary/10 text-primary; }
+            .tag-badge-green { @apply bg-secondary/10 text-secondary; }
+            .tag-badge-yellow { @apply bg-yellow-100 text-yellow-800; }
+            .tag-badge-red { @apply bg-accent/10 text-accent; }
+            .animate-fade-in {
+                animation: fadeIn 0.5s ease-in-out;
+            }
+            .animate-slide-in {
+                animation: slideIn 0.3s ease-out;
+            }
+            .timetable-cell {
+                @apply border border-gray-200 p-2 min-h-[60px] text-center transition-all duration-200 hover:bg-gray-50;
+            }
+            .timetable-header {
+                @apply border border-gray-200 p-2 bg-gray-50 font-medium text-center;
+            }
+            .timetable-subject {
+                @apply bg-primary/10 text-primary p-1 rounded mb-1 text-xs font-medium;
+            }
+            .timetable-lecturer {
+                @apply text-xs text-gray-600 mb-1;
+            }
+            .timetable-classroom {
+                @apply text-xs text-gray-500;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes slideIn {
+                from { transform: translateX(-20px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-dark">
+    <!-- Main Application -->
+    <div class="min-h-screen flex flex-col">
+        <!-- Top Navigation -->
+        {% include "_header.html" %}
+
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Sidebar -->
+            {% include "_sidebar.html" %}
+            <!-- Main Content -->
+            <div class="flex-1 overflow-y-auto bg-gray-50 p-6" id="main-content">
+                <!-- Generate Timetable Page -->
+                <div id="generate-page" class="animate-fade-in">
+                    <div class="mb-6">
+                        <h1 class="text-2xl font-bold text-dark mb-2">Generate Timetable</h1>
+                        <p class="text-gray-600">Configure parameters and generate the optimal timetable</p>
+                    </div>
+
+                    <!-- Generation Parameters -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <!-- Selection Criteria -->
+                        <div class="card">
+                            <h2 class="text-lg font-semibold mb-4">Selection Criteria</h2>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Subjects</label>
+                                <div class="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">CSC101 - Intro to Computer Science</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">CSC202 - Data Structures</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">MAT203 - Advanced Mathematics</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">ENG101 - Academic Writing</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">PHY102 - Physics Fundamentals</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between mt-2 text-sm">
+                                    <button class="text-primary hover:text-primary/80">Select All</button>
+                                    <button class="text-primary hover:text-primary/80">Deselect All</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Student Groups</label>
+                                <div class="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">UCSEW Year 1 Sem 2 Group A</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">UABM Year 1 Sem 2 Group B</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">UACCW Year 3 Sem 2 Group B</span>
+                                        </label>
+                                     
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">DITW Year 3 Sem 2 Group B</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between mt-2 text-sm">
+                                    <button class="text-primary hover:text-primary/80">Select All</button>
+                                    <button class="text-primary hover:text-primary/80">Deselect All</button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Lecturers</label>
+                                <div class="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">Dr. Sarah Johnson (Computer Science)</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">Prof. Michael Chen (Engineering)</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">Dr. James Wilson (Physics)</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">Dr. Emily Rodriguez (English)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between mt-2 text-sm">
+                                    <button class="text-primary hover:text-primary/80">Select All</button>
+                                    <button class="text-primary hover:text-primary/80">Deselect All</button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Classrooms</label>
+                                <div class="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">Lecture Hall A (100 seats)</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">Computer Lab B (50 seats)</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">Science Lab C (30 seats)</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                            <span class="ml-2">Seminar Room D (20 seats)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between mt-2 text-sm">
+                                    <button class="text-primary hover:text-primary/80">Select All</button>
+                                    <button class="text-primary hover:text-primary/80">Deselect All</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Time Configuration -->
+                        <div class="card">
+                            <h2 class="text-lg font-semibold mb-4">Time Configuration</h2>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Working Days</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                        <span class="ml-2">Monday</span>
+                                    </label>
+                                    <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                        <span class="ml-2">Tuesday</span>
+                                    </label>
+                                    <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                        <span class="ml-2">Wednesday</span>
+                                    </label>
+                                    <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                        <span class="ml-2">Thursday</span>
+                                    </label>
+                                    <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                        <span class="ml-2">Friday</span>
+                                    </label>
+                                    <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-primary">
+                                        <span class="ml-2">Saturday</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Daily Time Slots</label>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Start Time</label>
+                                        <input type="time" class="input-field" value="08:00">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">End Time</label>
+                                        <input type="time" class="input-field" value="17:00">
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-sm text-gray-500">
+                                    <i class="fa-solid fa-info-circle mr-1"></i> Each class will be 1 hour long with 10 minutes break between classes
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Lunch Break</label>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Start Time</label>
+                                        <input type="time" class="input-field" value="12:00">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Duration (minutes)</label>
+                                        <input type="number" class="input-field" value="60" min="30" max="120">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Public Holidays</label>
+                                <div class="space-y-2">
+                                    <div class="flex items-center p-2 bg-gray-50 rounded-lg">
+                                        <span class="text-sm">May 1, 2025 - Labor Day</span>
+                                        <button class="ml-auto text-gray-400 hover:text-red-500">
+                                            <i class="fa-solid fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center p-2 bg-gray-50 rounded-lg">
+                                        <span class="text-sm">Jun 15, 2025 - University Day</span>
+                                        <button class="ml-auto text-gray-400 hover:text-red-500">
+                                            <i class="fa-solid fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="date" class="input-field mr-2">
+                                        <input type="text" placeholder="Holiday name" class="input-field mr-2">
+                                        <button class="btn-primary py-2 px-3">
+                                            <i class="fa-solid fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Constraints Selection -->
+                        <div class="card">
+                            <h2 class="text-lg font-semibold mb-4">Constraints</h2>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Selected Constraints</label>
+                                <div class="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                                    <div class="space-y-2">
+                                        <div class="p-2 bg-blue-50 border border-blue-100 rounded-lg">
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm">Dr. Sarah Johnson must teach CSC101</span>
+                                                <button class="text-gray-400 hover:text-red-500">
+                                                    <i class="fa-solid fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="p-2 bg-blue-50 border border-blue-100 rounded-lg">
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm">CSC101 requires a computer lab</span>
+                                                <button class="text-gray-400 hover:text-red-500">
+                                                    <i class="fa-solid fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="p-2 bg-blue-50 border border-blue-100 rounded-lg">
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm">Dr. Emily Rodriguez unavailable on Fridays</span>
+                                                <button class="text-gray-400 hover:text-red-500">
+                                                    <i class="fa-solid fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <button id="add-constraint-btn-generate" class="btn-outline w-full">
+                                    <i class="fa-solid fa-plus mr-2"></i> Add Constraint
+                                </button>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Additional Constraints</label>
+                                <div class="space-y-3">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                        <span class="ml-2">No consecutive classes for same lecturer</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-primary">
+                                        <span class="ml-2">Evenly distribute classes across week</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-primary" checked>
+                                        <span class="ml-2">Respect lecturer availability</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-primary">
+                                        <span class="ml-2">Minimize classroom changes</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Hard Constraints Priority</label>
+                                <select class="input-field">
+                                    <option>Default (Balanced)</option>
+                                    <option>Lecturer Preferences First</option>
+                                    <option>Classroom Availability First</option>
+                                    <option>Subject Requirements First</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Generate Button -->
+                    <div class="flex justify-center mb-6">
+                        <button id="generate-timetable-btn" class="btn-primary px-8 py-3 flex items-center">
+                            <i class="fa-solid fa-magic mr-2"></i> Generate Timetable
+                        </button>
+                    </div>
+                    
+                    <!-- Loading Indicator (Hidden by default) -->
+                    <div id="loading-indicator" class="hidden fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+                        <div class="bg-white p-6 rounded-lg shadow-lg flex items-center">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                            <div class="ml-4">
+                                <h3 class="font-medium text-dark">Generating Timetable</h3>
+                                <p class="text-sm text-gray-500">This may take a moment...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Generated Timetable -->
+                    <div id="timetable-results" class="hidden">
+                        <div class="card mb-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-semibold">Generated Timetable</h2>
+                                <div class="flex gap-2">
+                                    <button class="btn-secondary text-sm">
+                                        <i class="fa-solid fa-download mr-1"></i> Export
+                                    </button>
+                                    <button class="btn-secondary text-sm">
+                                        <i class="fa-solid fa-print mr-1"></i> Print
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Solution Selector -->
+                            <div class="mb-4 flex items-center justify-between">
+                                <div class="text-sm">
+                                    <span class="font-medium">Solution 1</span> of 3 possible solutions
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="btn-outline text-sm px-3 py-1">
+                                        <i class="fa-solid fa-chevron-left"></i>
+                                    </button>
+                                    <button class="bg-primary text-white rounded-lg px-3 py-1 text-sm">1</button>
+                                    <button class="btn-outline text-sm px-3 py-1">2</button>
+                                    <button class="btn-outline text-sm px-3 py-1">3</button>
+                                    <button class="btn-outline text-sm px-3 py-1">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Solution Score -->
+                            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <div class="text-sm text-gray-500">Solution Score</div>
+                                        <div class="text-xl font-bold">87%</div>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-4 text-center">
+                                        <div>
+                                            <div class="text-sm text-gray-500">Hard Constraints</div>
+                                            <div class="font-medium">100%</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm text-gray-500">Soft Constraints</div>
+                                            <div class="font-medium">82%</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm text-gray-500">Efficiency</div>
+                                            <div class="font-medium">91%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Timetable Grid -->
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead>
+                                        <tr>
+                                            <th class="timetable-header w-24">Time</th>
+                                            <th class="timetable-header">Monday</th>
+                                            <th class="timetable-header">Tuesday</th>
+                                            <th class="timetable-header">Wednesday</th>
+                                            <th class="timetable-header">Thursday</th>
+                                            <th class="timetable-header">Friday</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="timetable-header">08:00 - 09:00</td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC101</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">MAT203</div>
+                                                <div class="timetable-lecturer">Prof. Michael Chen</div>
+                                                <div class="timetable-classroom">Hall A</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC202</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">ENG101</div>
+                                                <div class="timetable-lecturer">Dr. Emily Rodriguez</div>
+                                                <div class="timetable-classroom">Room D</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">PHY102</div>
+                                                <div class="timetable-lecturer">Dr. James Wilson</div>
+                                                <div class="timetable-classroom">Lab C</div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="timetable-header">09:00 - 10:00</td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC101</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">MAT203</div>
+                                                <div class="timetable-lecturer">Prof. Michael Chen</div>
+                                                <div class="timetable-classroom">Hall A</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC202</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">ENG101</div>
+                                                <div class="timetable-lecturer">Dr. Emily Rodriguez</div>
+                                                <div class="timetable-classroom">Room D</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">PHY102</div>
+                                                <div class="timetable-lecturer">Dr. James Wilson</div>
+                                                <div class="timetable-classroom">Lab C</div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="timetable-header">10:00 - 11:00</td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC202</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">PHY102</div>
+                                                <div class="timetable-lecturer">Dr. James Wilson</div>
+                                                <div class="timetable-classroom">Lab C</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">ENG101</div>
+                                                <div class="timetable-lecturer">Dr. Emily Rodriguez</div>
+                                                <div class="timetable-classroom">Room D</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">MAT203</div>
+                                                <div class="timetable-lecturer">Prof. Michael Chen</div>
+                                                <div class="timetable-classroom">Hall A</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC101</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="timetable-header">11:00 - 12:00</td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC202</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">PHY102</div>
+                                                <div class="timetable-lecturer">Dr. James Wilson</div>
+                                                <div class="timetable-classroom">Lab C</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">ENG101</div>
+                                                <div class="timetable-lecturer">Dr. Emily Rodriguez</div>
+                                                <div class="timetable-classroom">Room D</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">MAT203</div>
+                                                <div class="timetable-lecturer">Prof. Michael Chen</div>
+                                                <div class="timetable-classroom">Hall A</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC101</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="timetable-header bg-gray-100">12:00 - 13:00</td>
+                                            <td class="timetable-cell bg-gray-100 text-center" colspan="5">
+                                                <div class="text-gray-600">Lunch Break</div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="timetable-header">13:00 - 14:00</td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">ENG101</div>
+                                                <div class="timetable-lecturer">Dr. Emily Rodriguez</div>
+                                                <div class="timetable-classroom">Room D</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC101</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">MAT203</div>
+                                                <div class="timetable-lecturer">Prof. Michael Chen</div>
+                                                <div class="timetable-classroom">Hall A</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC202</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">PHY102</div>
+                                                <div class="timetable-lecturer">Dr. James Wilson</div>
+                                                <div class="timetable-classroom">Lab C</div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="timetable-header">14:00 - 15:00</td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">ENG101</div>
+                                                <div class="timetable-lecturer">Dr. Emily Rodriguez</div>
+                                                <div class="timetable-classroom">Room D</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC101</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">MAT203</div>
+                                                <div class="timetable-lecturer">Prof. Michael Chen</div>
+                                                <div class="timetable-classroom">Hall A</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC202</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">PHY102</div>
+                                                <div class="timetable-lecturer">Dr. James Wilson</div>
+                                                <div class="timetable-classroom">Lab C</div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="timetable-header">15:00 - 16:00</td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">MAT203</div>
+                                                <div class="timetable-lecturer">Prof. Michael Chen</div>
+                                                <div class="timetable-classroom">Hall A</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">PHY102</div>
+                                                <div class="timetable-lecturer">Dr. James Wilson</div>
+                                                <div class="timetable-classroom">Lab C</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC202</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">ENG101</div>
+                                                <div class="timetable-lecturer">Dr. Emily Rodriguez</div>
+                                                <div class="timetable-classroom">Room D</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">MAT203</div>
+                                                <div class="timetable-lecturer">Prof. Michael Chen</div>
+                                                <div class="timetable-classroom">Hall A</div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="timetable-header">16:00 - 17:00</td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">MAT203</div>
+                                                <div class="timetable-lecturer">Prof. Michael Chen</div>
+                                                <div class="timetable-classroom">Hall A</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">PHY102</div>
+                                                <div class="timetable-lecturer">Dr. James Wilson</div>
+                                                <div class="timetable-classroom">Lab C</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">CSC202</div>
+                                                <div class="timetable-lecturer">Dr. Sarah Johnson</div>
+                                                <div class="timetable-classroom">Lab B</div>
+                                            </td>
+                                            <td class="timetable-cell">
+                                                <div class="timetable-subject">ENG101</div>
+                                                <div class="timetable-lecturer">Dr. Emily Rodriguez</div>
+                                                <div class="timetable-classroom">Room D</div>
+                                            </td>
+                                            <td class="timetable-cell bg-gray-100">
+                                                <div class="text-gray-500 text-sm">No Class</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Solution Comparison -->
+                            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                                <h3 class="font-medium mb-3">Solution Comparison</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="p-3 bg-white rounded-lg border border-gray-200">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="font-medium">Solution 1</span>
+                                            <span class="text-primary font-bold">87%</span>
+                                        </div>
+                                        <div class="text-sm text-gray-600">
+                                            <div class="flex justify-between mb-1">
+                                                <span>Hard Constraints</span>
+                                                <span class="font-medium">100%</span>
+                                            </div>
+                                            <div class="flex justify-between mb-1">
+                                                <span>Soft Constraints</span>
+                                                <span class="font-medium">82%</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span>Classroom Changes</span>
+                                                <span class="font-medium">12</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-3 bg-white rounded-lg border border-gray-200">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="font-medium">Solution 2</span>
+                                            <span class="text-primary font-bold">84%</span>
+                                        </div>
+                                        <div class="text-sm text-gray-600">
+                                            <div class="flex justify-between mb-1">
+                                                <span>Hard Constraints</span>
+                                                <span class="font-medium">100%</span>
+                                            </div>
+                                            <div class="flex justify-between mb-1">
+                                                <span>Soft Constraints</span>
+                                                <span class="font-medium">79%</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span>Classroom Changes</span>
+                                                <span class="font-medium">10</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-3 bg-white rounded-lg border border-gray-200">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="font-medium">Solution 3</span>
+                                            <span class="text-primary font-bold">81%</span>
+                                        </div>
+                                        <div class="text-sm text-gray-600">
+                                            <div class="flex justify-between mb-1">
+                                                <span>Hard Constraints</span>
+                                                <span class="font-medium">95%</span>
+                                            </div>
+                                            <div class="flex justify-between mb-1">
+                                                <span>Soft Constraints</span>
+                                                <span class="font-medium">85%</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span>Classroom Changes</span>
+                                                <span class="font-medium">8</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-4 justify-end">
+                            <button class="btn-secondary flex-1 sm:flex-none">
+                                <i class="fa-solid fa-refresh mr-2"></i> Regenerate
+                            </button>
+                            <button class="btn-primary flex-1 sm:flex-none">
+                                <i class="fa-solid fa-check mr-2"></i> Save This Timetable
+                            </button>
+                            <button id="make-changes-btn" class="btn-outline flex-1 sm:flex-none">
+                                <i class="fa-solid fa-sliders mr-2"></i> Make Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Constraint Modal (Generate Page) -->
+    <div id="add-constraint-modal-generate" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">Add Constraint</h3>
+                    <button id="close-constraint-modal-generate" class="text-gray-400 hover:text-gray-600">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <form id="constraint-form-generate">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-1">Constraint Type</label>
+                        <select id="constraint-type-generate" class="input-field" onchange="toggleConstraintFieldsGenerate()">
+                            <option value="lecturer">Lecturer Assignment</option>
+                            <option value="classroom">Classroom Requirement</option>
+                            <option value="student">Student Groups</option>
+                            <option value="capacity">Student Capacity</option>
+                            <option value="availability">Lecturer Availability</option>
+                            <option value="dependency">Subject Dependency</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Lecturer Assignment Fields -->
+                    <div id="lecturer-fields-generate">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Lecturer</label>
+                            <select class="input-field">
+                                <option value="">Select lecturer</option>
+                                <option value="sarah">Dr. Sarah Johnson (Computer Science)</option>
+                                <option value="michael">Prof. Michael Chen (Engineering)</option>
+                                <option value="james">Dr. James Wilson (Physics)</option>
+                                <option value="emily">Dr. Emily Rodriguez (English)</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Assignment Type</label>
+                            <select class="input-field">
+                                <option value="must">Must Teach</option>
+                                <option value="preferred">Preferred to Teach</option>
+                                <option value="cannot">Cannot Teach</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Subject</label>
+                            <select class="input-field">
+                                <option value="">Select subject</option>
+                                <option value="CSC101">CSC101 - Intro to Computer Science</option>
+                                <option value="CSC202">CSC202 - Data Structures</option>
+                                <option value="MAT203">MAT203 - Advanced Mathematics</option>
+                                <option value="ENG101">ENG101 - Academic Writing</option>
+                                <option value="PHY102">PHY102 - Physics Fundamentals</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Student Groups Fields -->
+<div id="student-fields-generate" class="space-y-4 hidden">
+    <div>
+        <label class="block text-sm font-medium mb-1">Student Group</label>
+        <select class="input-field" name="studentGroup">
+            <option value="">Select student group</option>
+            <option value="UCSEW_Y1S2A">UCSEW Year 1 Sem 2 Group A</option>
+            <option value="UABM_Y1S2B">UABM Year 1 Sem 2 Group B</option>
+            <option value="UACCW_Y3S2B">UACCW Year 3 Sem 2 Group B</option>
+            <option value="DITW_Y3S2B">DITW Year 3 Sem 2 Group B</option>
+        </select>
+    </div>
+    <div>
+        <label class="block text-sm font-medium mb-1">Subjects</label>
+        <select class="input-field" name="subjects[]" multiple size="5">
+            <option value="CSC101">CSC101 - Intro to Computer Science</option>
+            <option value="CSC202">CSC202 - Data Structures</option>
+            <option value="MAT203">MAT203 - Advanced Mathematics</option>
+            <option value="ENG101">ENG101 - Academic Writing</option>
+            <option value="PHY102">PHY102 - Physics Fundamentals</option>
+        </select>
+        <small class="text-gray-500">Hold Ctrl (Cmd on Mac) to select multiple subjects</small>
+    </div>
+</div>
+                    
+                    <!-- Classroom Requirement Fields -->
+                    <div id="classroom-fields-generate" class="hidden">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Subject</label>
+                            <select class="input-field">
+                                <option value="">Select subject</option>
+                                <option value="CSC101">CSC101 - Intro to Computer Science</option>
+                                <option value="CSC202">CSC202 - Data Structures</option>
+                                <option value="MAT203">MAT203 - Advanced Mathematics</option>
+                                <option value="ENG101">ENG101 - Academic Writing</option>
+                                <option value="PHY102">PHY102 - Physics Fundamentals</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Classroom Type</label>
+                            <select class="input-field">
+                                <option value="lecture">Lecture Hall</option>
+                                <option value="computer">Computer Lab</option>
+                                <option value="science">Science Lab</option>
+                                <option value="seminar">Seminar Room</option>
+                                <option value="tutorial">Tutorial Room</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Additional Notes (Optional)</label>
+                            <textarea class="input-field" rows="2" placeholder="Special requirements..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Student Capacity Fields -->
+                    <div id="capacity-fields-generate" class="hidden">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Subject</label>
+                            <select class="input-field">
+                                <option value="">Select subject</option>
+                                <option value="CSC101">CSC101 - Intro to Computer Science</option>
+                                <option value="CSC202">CSC202 - Data Structures</option>
+                                <option value="MAT203">MAT203 - Advanced Mathematics</option>
+                                <option value="ENG101">ENG101 - Academic Writing</option>
+                                <option value="PHY102">PHY102 - Physics Fundamentals</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Maximum Students</label>
+                                <input type="number" class="input-field" placeholder="Max students">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Minimum Students (Optional)</label>
+                                <input type="number" class="input-field" placeholder="Min students">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lecturer Availability Fields -->
+                    <div id="availability-fields-generate" class="hidden">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Lecturer</label>
+                            <select class="input-field">
+                                <option value="">Select lecturer</option>
+                                <option value="sarah">Dr. Sarah Johnson (Computer Science)</option>
+                                <option value="michael">Prof. Michael Chen (Engineering)</option>
+                                <option value="james">Dr. James Wilson (Physics)</option>
+                                <option value="emily">Dr. Emily Rodriguez (English)</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Availability Type</label>
+                            <select class="input-field">
+                                <option value="unavailable">Unavailable On</option>
+                                <option value="preferred">Preferred On</option>
+                                <option value="only">Only Available On</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Days</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary">
+                                    <span class="ml-2">Monday</span>
+                                </label>
+                                <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary">
+                                    <span class="ml-2">Tuesday</span>
+                                </label>
+                                <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary">
+                                    <span class="ml-2">Wednesday</span>
+                                </label>
+                                <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary">
+                                    <span class="ml-2">Thursday</span>
+                                </label>
+                                <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary">
+                                    <span class="ml-2">Friday</span>
+                                </label>
+                                <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary">
+                                    <span class="ml-2">Saturday</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Times (Optional)</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary">
+                                    <span class="ml-2">Morning</span>
+                                </label>
+                                <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary">
+                                    <span class="ml-2">Afternoon</span>
+                                </label>
+                                <label class="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 text-primary">
+                                    <span class="ml-2">Evening</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Subject Dependency Fields -->
+                    <div id="dependency-fields-generate" class="hidden">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Subject</label>
+                            <select class="input-field">
+                                <option value="">Select subject</option>
+                                <option value="CSC101">CSC101 - Intro to Computer Science</option>
+                                <option value="CSC202">CSC202 - Data Structures</option>
+                                <option value="MAT203">MAT203 - Advanced Mathematics</option>
+                                <option value="ENG101">ENG101 - Academic Writing</option>
+                                <option value="PHY102">PHY102 - Physics Fundamentals</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Dependency Type</label>
+                            <select class="input-field">
+                                <option value="prerequisite">Prerequisite</option>
+                                <option value="corequisite">Corequisite</option>
+                                <option value="not-with">Cannot be scheduled with</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Dependent Subject</label>
+                            <select class="input-field">
+                                <option value="">Select subject</option>
+                                <option value="CSC101">CSC101 - Intro to Computer Science</option>
+                                <option value="CSC202">CSC202 - Data Structures</option>
+                                <option value="MAT203">MAT203 - Advanced Mathematics</option>
+                                <option value="ENG101">ENG101 - Academic Writing</option>
+                                <option value="PHY102">PHY102 - Physics Fundamentals</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1">Additional Notes (Optional)</label>
+                            <textarea class="input-field" rows="2" placeholder="Explain the dependency..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                        <button type="button" id="cancel-constraint-generate" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-primary">Add Constraint</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Notification -->
+    <div id="success-notification" class="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-500 flex items-center z-50">
+        <i class="fa-solid fa-check-circle mr-2"></i>
+        <span id="notification-message">Constraint added successfully!</span>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const generateTimetableBtn = document.getElementById('generate-timetable-btn');
+        const timetableResults = document.getElementById('timetable-results');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const addConstraintBtnGenerate = document.getElementById('add-constraint-btn-generate');
+        const addConstraintModalGenerate = document.getElementById('add-constraint-modal-generate');
+        const closeConstraintModalGenerate = document.getElementById('close-constraint-modal-generate');
+        const cancelConstraintGenerate = document.getElementById('cancel-constraint-generate');
+        const constraintFormGenerate = document.getElementById('constraint-form-generate');
+        const constraintTypeGenerate = document.getElementById('constraint-type-generate');
+        const successNotification = document.getElementById('success-notification');
+        const notificationMessage = document.getElementById('notification-message');
+        const makeChangesBtn = document.getElementById('make-changes-btn');
+        
+        // Toggle Sidebar
+        sidebarToggle.addEventListener('click', function() {
+            if (sidebar.classList.contains('translate-x-0') || !sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+            }
+        });
+        
+        // Show/hide constraint fields based on selected type (Generate Page)
+        function toggleConstraintFieldsGenerate() {
+            const type = constraintTypeGenerate.value;
+            
+            // Hide all field sets
+            document.getElementById('lecturer-fields-generate').classList.add('hidden');
+            document.getElementById('classroom-fields-generate').classList.add('hidden');
+            document.getElementById('capacity-fields-generate').classList.add('hidden');
+            document.getElementById('availability-fields-generate').classList.add('hidden');
+            document.getElementById('dependency-fields-generate').classList.add('hidden');
+            document.getElementById('student-fields-generate').classList.add('hidden');
+            
+            // Show selected field set
+            document.getElementById(`${type}-fields-generate`).classList.remove('hidden');
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            notificationMessage.textContent = message;
+            successNotification.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                successNotification.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+        
+        // Generate Timetable
+        generateTimetableBtn.addEventListener('click', function() {
+            // Show loading indicator
+            loadingIndicator.classList.remove('hidden');
+            
+            // Simulate generation process
+            setTimeout(() => {
+                // Hide loading indicator
+                loadingIndicator.classList.add('hidden');
+                
+                // Show generated timetable
+                timetableResults.classList.remove('hidden');
+                
+                // Scroll to results
+                timetableResults.scrollIntoView({ behavior: 'smooth' });
+                
+                // Show success notification
+                showNotification('Timetable generated successfully!');
+            }, 2000); // Simulating 2-second generation time
+        });
+        
+        // Add Constraint Modal (Generate Page)
+        addConstraintBtnGenerate.addEventListener('click', function() {
+            addConstraintModalGenerate.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+        });
+        
+        closeConstraintModalGenerate.addEventListener('click', function() {
+            addConstraintModalGenerate.classList.add('hidden');
+            document.body.style.overflow = ''; // Re-enable scrolling
+        });
+        
+        cancelConstraintGenerate.addEventListener('click', function() {
+            addConstraintModalGenerate.classList.add('hidden');
+            document.body.style.overflow = ''; // Re-enable scrolling
+        });
+        
+        // Handle Constraint Form Submission (Generate Page)
+        constraintFormGenerate.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show success notification
+            showNotification('Constraint added successfully!');
+            
+            // Close modal
+            addConstraintModalGenerate.classList.add('hidden');
+            document.body.style.overflow = ''; // Re-enable scrolling
+        });
+        
+        // Make Changes Button
+        makeChangesBtn.addEventListener('click', function() {
+            // Show notification
+            showNotification('You can now adjust constraints and parameters');
+            
+            // Scroll back to parameters
+            document.getElementById('generate-page').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === addConstraintModalGenerate) {
+                addConstraintModalGenerate.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Escape key to close modals
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                addConstraintModalGenerate.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+</body>
+</html>

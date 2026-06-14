@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AICelerate - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-logo">
+            <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-center text-dark mb-6">Sign in to AICelerate</h2>
+        <p class="text-gray-600 text-center mb-8">Access your university timetable scheduling system</p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <form action="{{ url_for('auth_bp.login') }}" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Username" >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="relative">
+                    <input type="password" id="password" name="password" placeholder="Password"  class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none">
+                    <i class="fa-solid fa-eye-slash toggle-password absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" onclick="togglePasswordVisibility()"></i>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary mt-6">
+                Sign In
+            </button>
+        </form>
+    </div>
+</body>
+</html>
+ 
